@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Does This Website Know About You?</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#fdfaf5;font-family:'Nunito',sans-serif;color:#22201e;overflow-x:hidden}
+
+/* ══════════════════════════════════════════════════════════
+   HERO — full viewport, navy background
+══════════════════════════════════════════════════════════ */
+.hero{
+  position:relative;
+  width:100%;
+  height:100svh;          /* full screen on every device */
+  min-height:560px;
+  background:#1e2a4a;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
+  padding:24px;
+}
+
+/* Subtle radial glows */
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(91,106,240,.28) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 50%, rgba(240,96,112,.2)  0%, transparent 55%),
+    radial-gradient(ellipse at 50% 0%,  rgba(91,106,240,.12) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+/* ── FLOATING ICONS ── */
+.floaties{position:absolute;inset:0;pointer-events:none;z-index:0}
+.fi{
+  position:absolute;
+  font-size:var(--s,32px);
+  opacity:var(--o,.2);
+  animation:drift var(--d,14s) ease-in-out infinite;
+  animation-delay:var(--dl,0s);
+  user-select:none;
+  line-height:1;
+}
+@keyframes drift{
+  0%,100%{transform:translate(0,0)          rotate(0deg)}
+  25%    {transform:translate(var(--tx,10px),var(--ty,-14px)) rotate(var(--r,6deg))}
+  75%    {transform:translate(calc(var(--tx,10px)*-.7),var(--ty2,10px)) rotate(calc(var(--r,6deg)*-1))}
+}
+
+/* ── HERO CONTENT ── */
+.hero-inner{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  max-width:720px;width:100%;
+}
+
+
+.hero-emoji{
+  font-size:clamp(56px,10vw,96px);
+  line-height:1;
+  margin-bottom:clamp(18px,4vw,32px);
+  animation:bob 3.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 32px rgba(91,106,240,.5));
+}
+@keyframes bob{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%    {transform:translateY(-10px) scale(1.04)}
+}
+
+.hero-title{
+  font-family:'Outfit',sans-serif;
+  font-size:clamp(28px,6vw,68px);
+  font-weight:800;
+  color:white;
+  line-height:1.1;
+  margin-bottom:clamp(14px,3vw,24px);
+  letter-spacing:-1px;
+  text-shadow:0 2px 24px rgba(0,0,0,.25);
+}
+.hero-title .accent{
+  color:#fff;
+  text-shadow:0 0 40px rgba(255,255,255,.55), 0 2px 24px rgba(0,0,0,.3);
+}
+
+.hero-sub{
+  font-size:clamp(15px,2.2vw,20px);
+  color:rgba(255,255,255,.72);
+  max-width:540px;
+  line-height:1.65;
+  font-weight:400;
+  margin-bottom:clamp(28px,5vw,44px);
+}
+
+.hero-badge{
+  display:inline-block;
+  background:none;
+  color:rgba(255,255,255,.5);
+  border:none;
+  padding:0;
+  border-radius:0;
+  font-size:clamp(12px,1.6vw,14px);
+  font-weight:500;
+  letter-spacing:.3px;
+  font-style:italic;
+  margin-bottom:clamp(16px,3vw,24px);
+}
+
+/* ── SCROLL INDICATOR ── */
+.scroll-hint{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:rgba(255,255,255,.45);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  animation:fadeHint 2s ease-in-out infinite;
+  cursor:pointer;
+}
+@keyframes fadeHint{0%,100%{opacity:.45}50%{opacity:.9}}
+
+.scroll-arrow{
+  width:28px;height:28px;
+  border-right:2.5px solid rgba(255,255,255,.45);
+  border-bottom:2.5px solid rgba(255,255,255,.45);
+  transform:rotate(45deg);
+  animation:bounceArrow 1.6s ease-in-out infinite;
+}
+@keyframes bounceArrow{
+  0%,100%{transform:rotate(45deg) translate(0,0);opacity:.45}
+  50%    {transform:rotate(45deg) translate(4px,4px);opacity:.9}
+}
+
+/* ── WAVE ── */
+.wave-divider{
+  display:block;width:100%;
+  margin-top:-2px;
+  /* wave is drawn inline as SVG below */
+}
+
+/* ══════════════════════════════════════════════════════════
+   CONTENT SECTION
+══════════════════════════════════════════════════════════ */
+.content{background:#fdfaf5}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 100px}
+
+.intro{
+  background:white;
+  border-radius:24px;
+  padding:clamp(24px,5vw,36px) clamp(24px,5vw,40px);
+  margin-bottom:12px;
+  box-shadow:0 4px 28px rgba(91,106,240,.1);
+  border-top:5px solid transparent;
+  border-image:linear-gradient(90deg,#5b6af0,#c05ab0,#f06070) 1;
+  /* scroll-reveal: starts invisible */
+  opacity:0;
+  transform:translateY(32px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.intro.visible{opacity:1;transform:none}
+.intro h2{
+  font-family:'Outfit',sans-serif;
+  font-size:clamp(17px,3vw,21px);
+  font-weight:700;color:#5b6af0;margin-bottom:8px
+}
+.intro p{font-size:clamp(14px,2vw,16px);line-height:1.75;color:#6a6058}
+
+.section-label{
+  font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  color:#5b6af0;margin:clamp(32px,6vw,48px) 0 16px;
+  display:flex;align-items:center;gap:10px;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.section-label.visible{opacity:1;transform:none}
+.section-label::after{content:'';flex:1;height:2px;border-radius:2px;background:linear-gradient(to right,#5b6af0,transparent)}
+
+.card{
+  background:white;border-radius:20px;
+  padding:clamp(16px,3vw,22px) clamp(18px,4vw,28px);
+  margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:clamp(12px,3vw,18px);
+  box-shadow:0 2px 16px rgba(0,0,0,.06);
+  border:1.5px solid #e8eaff;
+  transition:transform .2s,box-shadow .2s,border-color .2s,opacity .6s ease;
+  /* scroll reveal */
+  opacity:0;transform:translateY(28px);
+}
+.card.visible{opacity:1;transform:none}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(91,106,240,.13);border-color:#b8bfff}
+
+.card-icon{
+  font-size:clamp(24px,4vw,30px);
+  width:clamp(44px,7vw,52px);height:clamp(44px,7vw,52px);
+  border-radius:14px;background:#e8eaff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.card:nth-child(3n+1) .card-icon{background:#e8eaff}
+.card:nth-child(3n+2) .card-icon{background:#ede8ff}
+.card:nth-child(3n)   .card-icon{background:#fce8f8}
+
+.card-body{flex:1;min-width:0}
+.card-label{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#b0a898;margin-bottom:3px}
+.card-title{font-family:'Outfit',sans-serif;font-size:clamp(14px,2.5vw,16px);font-weight:700;color:#22201e;margin-bottom:4px}
+.card-value{font-size:clamp(15px,2.5vw,18px);font-weight:700;color:#5b6af0;margin-bottom:6px;word-break:break-all}
+.card:nth-child(3n+2) .card-value{color:#8b5af0}
+.card:nth-child(3n)   .card-value{color:#c05ab0}
+.card-explain{font-size:clamp(12px,2vw,13px);color:#8a8078;line-height:1.65;background:#fdfaf5;border-radius:10px;padding:8px 12px}
+.card-explain strong{color:#5b6af0}
+
+/* loading spinner */
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(91,106,240,.2);border-top-color:#5b6af0;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* permission banner */
+.perm-banner{
+  background:#fff8e8;border:1.5px solid #f5d87a;border-radius:16px;
+  padding:14px 20px;margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:12px;
+  font-size:13px;color:#7a6020;line-height:1.55;
+  opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s;
+}
+.perm-banner.visible{opacity:1;transform:none}
+.perm-banner strong{color:#5a4010}
+
+/* GPS button */
+.btn-gps{
+  margin-top:10px;padding:10px 22px;
+  background:#5b6af0;color:white;
+  border:none;border-radius:50px;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:background .2s,transform .15s;
+}
+.btn-gps:hover{background:#4455dd;transform:translateY(-1px)}
+.maps-link{display:none;margin-top:10px;background:#f06070;color:white;border-radius:50px;padding:10px 22px;font-weight:700;font-size:14px;text-decoration:none;font-family:'Nunito',sans-serif}
+
+/* explainer grid */
+.explainer{
+  background:white;border-radius:24px;padding:clamp(24px,5vw,36px) clamp(24px,5vw,40px);
+  margin-top:clamp(32px,6vw,48px);margin-bottom:12px;
+  box-shadow:0 2px 16px rgba(0,0,0,.06);
+  opacity:0;transform:translateY(28px);transition:opacity .6s,transform .6s;
+}
+.explainer.visible{opacity:1;transform:none}
+.explainer h2{font-family:'Outfit',sans-serif;font-size:clamp(18px,3vw,22px);font-weight:700;color:#22201e;margin-bottom:6px}
+.explainer p{font-size:14px;color:#8a8078;line-height:1.6;margin-bottom:24px}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.ex-item{background:#fdfaf5;border-radius:16px;padding:18px 16px;text-align:center}
+.ex-emoji{font-size:28px;margin-bottom:8px;display:block}
+.ex-item h4{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#22201e;margin-bottom:4px}
+.ex-item p{font-size:12px;color:#8a8078;line-height:1.55}
+
+/* tips */
+.tips{
+  background:white;border-radius:24px;padding:clamp(24px,5vw,36px) clamp(24px,5vw,40px);
+  margin-bottom:12px;
+  box-shadow:0 2px 16px rgba(0,0,0,.06);
+  opacity:0;transform:translateY(28px);transition:opacity .6s,transform .6s;
+}
+.tips.visible{opacity:1;transform:none}
+.tips h2{font-family:'Outfit',sans-serif;font-size:clamp(18px,3vw,22px);font-weight:700;color:#22201e;margin-bottom:20px}
+.tip{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.tip:last-child{margin-bottom:0}
+.tip-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5b6af0,#c05ab0);color:white;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.tip p{font-size:clamp(13px,2vw,15px);color:#6a6058;line-height:1.65}
+.tip strong{color:#22201e}
+
+footer{
+  text-align:center;padding:clamp(24px,5vw,40px) 20px;
+  font-size:13px;color:#b0a898;
+  border-top:1px solid #ede8e0;
+}
+footer strong{color:#5b6af0}
+
+/* canvas fingerprint */
+#canvas-fp{border-radius:10px;max-width:100%;display:block;margin-top:6px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+
+  <!-- Floating privacy icons -->
+  <div class="floaties" aria-hidden="true">
+    <!-- top row -->
+    <span class="fi" style="--s:52px;--o:.22;--d:14s;--dl:0s;  --tx:18px; --ty:-20px;--ty2:14px;--r:8deg;  top:6%;  left:3%">🔍</span>
+    <span class="fi" style="--s:36px;--o:.18;--d:11s;--dl:1.2s;--tx:-12px;--ty:16px; --ty2:-10px;--r:-6deg;top:12%; left:14%">🍪</span>
+    <span class="fi" style="--s:44px;--o:.2; --d:16s;--dl:2.5s;--tx:14px; --ty:-14px;--ty2:18px;--r:11deg; top:4%;  left:28%">🌐</span>
+    <span class="fi" style="--s:30px;--o:.16;--d:13s;--dl:.6s;  --tx:-10px;--ty:20px; --ty2:-8px; --r:-5deg; top:18%; left:43%">📍</span>
+    <span class="fi" style="--s:46px;--o:.2; --d:15s;--dl:3.2s;--tx:12px; --ty:-18px;--ty2:12px;--r:7deg;  top:6%;  left:58%">🔒</span>
+    <span class="fi" style="--s:32px;--o:.17;--d:12s;--dl:1.8s;--tx:-14px;--ty:12px; --ty2:-14px;--r:-8deg;top:16%; left:72%">👁️</span>
+    <span class="fi" style="--s:40px;--o:.19;--d:17s;--dl:4.5s;--tx:10px; --ty:-22px;--ty2:16px;--r:6deg;  top:4%;  left:85%">📡</span>
+    <span class="fi" style="--s:34px;--o:.15;--d:19s;--dl:0.3s;--tx:-8px; --ty:14px; --ty2:-12px;--r:-4deg;top:10%; left:95%">🛡️</span>
+    <!-- middle -->
+    <span class="fi" style="--s:28px;--o:.14;--d:13s;--dl:2s;  --tx:16px; --ty:-10px;--ty2:8px; --r:9deg;  top:40%; left:1%">🔑</span>
+    <span class="fi" style="--s:38px;--o:.16;--d:15s;--dl:5s;  --tx:-10px;--ty:18px; --ty2:-14px;--r:-7deg;top:45%; left:96%">🕵️</span>
+    <!-- bottom row -->
+    <span class="fi" style="--s:42px;--o:.19;--d:14s;--dl:1s;  --tx:14px; --ty:-16px;--ty2:12px;--r:7deg;  top:68%; left:4%">📱</span>
+    <span class="fi" style="--s:34px;--o:.17;--d:11s;--dl:2.8s;--tx:-12px;--ty:14px; --ty2:-16px;--r:-8deg;top:75%; left:16%">🌍</span>
+    <span class="fi" style="--s:30px;--o:.14;--d:16s;--dl:4s;  --tx:10px; --ty:-18px;--ty2:10px;--r:5deg;  top:82%; left:32%">🔋</span>
+    <span class="fi" style="--s:38px;--o:.18;--d:13s;--dl:.4s;  --tx:-14px;--ty:10px; --ty2:-12px;--r:-9deg;top:70%; left:50%">🖥️</span>
+    <span class="fi" style="--s:32px;--o:.15;--d:18s;--dl:3.8s;--tx:12px; --ty:-14px;--ty2:16px;--r:6deg;  top:78%; left:66%">🎵</span>
+    <span class="fi" style="--s:44px;--o:.18;--d:12s;--dl:1.5s;--tx:-10px;--ty:18px; --ty2:-10px;--r:-5deg;top:66%; left:80%">🎨</span>
+    <span class="fi" style="--s:28px;--o:.13;--d:15s;--dl:6s;  --tx:8px;  --ty:-12px;--ty2:14px;--r:4deg;  top:85%; left:93%">🔎</span>
+  </div>
+
+  <!-- Content -->
+  <div class="hero-inner">
+    <span class="hero-emoji">🔍</span>
+    <h1 class="hero-title">
+      This page already knows<br>
+      <span class="accent">a lot about you.</span>
+    </h1>
+    <span class="hero-badge">You didn't click anything. You didn't sign up. It just knows.</span>
+    <p class="hero-sub">Scroll down to see exactly what.</p>
+    <div class="scroll-hint" onclick="document.getElementById('content').scrollIntoView({behavior:'smooth'})">
+      <span>Show me</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- Wave transition -->
+<svg style="display:block;width:100%;margin-top:-2px;background:#1e2a4a" viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,36 C240,72 480,0 720,36 C960,72 1200,0 1440,36 L1440,72 L0,72Z" fill="#fdfaf5"/>
+</svg>
+
+<!-- ══════════════════════════════════════════════════════════
+     CONTENT
+══════════════════════════════════════════════════════════ -->
+<div class="content" id="content">
+<div class="wrap">
+
+  <div class="intro reveal">
+    <h2>👋 Hello! Don't worry, you are safe here.</h2>
+    <p>This page is here to <strong>show you</strong>, in plain language, exactly what information websites can see about you. Nothing here is stored or sent anywhere. It's just for your eyes! Think of it like looking in a mirror.</p>
+  </div>
+
+  <!-- ── SECTION: Location ── -->
+  <div class="section-label reveal">📍 Where you are in the world</div>
+
+  <div class="card reveal">
+    <div class="card-icon">🌐</div>
+    <div class="card-body">
+      <div class="card-label">Your IP Address</div>
+      <div class="card-title">Your Internet "Home Address"</div>
+      <div class="card-value" id="ip-value">Looking this up… <span class="loading"></span></div>
+      <div class="card-explain">Every device on the internet has an IP address — like a home address, but for data. Websites can see it automatically. <strong>This tells them roughly which city or region you're in.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🗺️</div>
+    <div class="card-body">
+      <div class="card-label">Approximate Location</div>
+      <div class="card-title">Your Estimated City &amp; Country</div>
+      <div class="card-value" id="location-value">Detecting… <span class="loading"></span></div>
+      <div class="card-explain">From your IP address alone, websites can usually guess your <strong>city, region, and country</strong>. They don't need you to type it in!</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🏢</div>
+    <div class="card-body">
+      <div class="card-label">Internet Service Provider</div>
+      <div class="card-title">Who Provides Your Internet</div>
+      <div class="card-value" id="isp-value">Detecting… <span class="loading"></span></div>
+      <div class="card-explain">Your ISP is the company you pay for internet. <strong>Websites can see your provider just from your IP address.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🕐</div>
+    <div class="card-body">
+      <div class="card-label">Time Zone</div>
+      <div class="card-title">What Clock You're Living By</div>
+      <div class="card-value" id="tz-value">—</div>
+      <div class="card-explain">Your device automatically tells websites your time zone. <strong>This helps confirm where in the world you are</strong>, even if you're using a VPN.</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: Device ── -->
+  <div class="section-label reveal">💻 Your device &amp; browser</div>
+
+  <div class="card reveal">
+    <div class="card-icon">🌍</div>
+    <div class="card-body">
+      <div class="card-label">Browser</div>
+      <div class="card-title">Which App You're Using to Browse</div>
+      <div class="card-value" id="browser-value">—</div>
+      <div class="card-explain">Whether Chrome, Firefox, Safari, or Edge — <strong>websites know immediately.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">📱</div>
+    <div class="card-body">
+      <div class="card-label">Device Type</div>
+      <div class="card-title">Phone, Tablet, or Computer?</div>
+      <div class="card-value" id="device-value">—</div>
+      <div class="card-explain">Websites can tell <strong>what type of device</strong> you're on so they can adjust how the page looks for you.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🖥️</div>
+    <div class="card-body">
+      <div class="card-label">Screen Size</div>
+      <div class="card-title">How Big Your Screen Is</div>
+      <div class="card-value" id="screen-value">—</div>
+      <div class="card-explain">Your exact screen size in pixels. <strong>Combined with other info, this helps identify your device</strong> even across different websites.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">💡</div>
+    <div class="card-body">
+      <div class="card-label">Operating System</div>
+      <div class="card-title">Windows, Mac, iPhone, or Android?</div>
+      <div class="card-value" id="os-value">—</div>
+      <div class="card-explain">Your operating system is part of what your browser automatically tells every website you visit.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🌐</div>
+    <div class="card-body">
+      <div class="card-label">Language</div>
+      <div class="card-title">What Language Your Device Is Set To</div>
+      <div class="card-value" id="lang-value">—</div>
+      <div class="card-explain">Websites see your <strong>preferred language</strong> instantly. They use this to decide which language to show you.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🔋</div>
+    <div class="card-body">
+      <div class="card-label">Battery Level</div>
+      <div class="card-title">How Much Charge Your Device Has</div>
+      <div class="card-value" id="battery-value">Checking… <span class="loading"></span></div>
+      <div class="card-explain"><strong>Yes, really!</strong> Some websites can see how much battery you have. Some companies have even used this to charge higher prices to people with low batteries.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">📶</div>
+    <div class="card-body">
+      <div class="card-label">Internet Connection</div>
+      <div class="card-title">How You're Connected</div>
+      <div class="card-value" id="connection-value">—</div>
+      <div class="card-explain">Websites can often tell if you're on <strong>WiFi, mobile data, or a cable</strong> — and roughly how fast your connection is.</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: Preferences ── -->
+  <div class="section-label reveal">⚙️ Your browser preferences</div>
+
+  <div class="card reveal">
+    <div class="card-icon">🚫</div>
+    <div class="card-body">
+      <div class="card-label">Do Not Track</div>
+      <div class="card-title">Have You Asked Not to Be Tracked?</div>
+      <div class="card-value" id="dnt-value">—</div>
+      <div class="card-explain">Your browser can send a "please don't track me" signal. <strong>Most websites ignore it completely</strong> — there's no law forcing them to obey it.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🌓</div>
+    <div class="card-body">
+      <div class="card-label">Dark / Light Mode</div>
+      <div class="card-title">Your Colour Scheme Preference</div>
+      <div class="card-value" id="darkmode-value">—</div>
+      <div class="card-explain">Your display preference is visible to every website. <strong>It's one more small detail that makes your fingerprint unique.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🛡️</div>
+    <div class="card-body">
+      <div class="card-label">Ad Blocker</div>
+      <div class="card-title">Are You Blocking Adverts?</div>
+      <div class="card-value" id="adblock-value">Checking… <span class="loading"></span></div>
+      <div class="card-explain">Websites quietly check whether you're using an ad blocker. <strong>Some sites refuse to load unless you turn it off.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">👆</div>
+    <div class="card-body">
+      <div class="card-label">Touchscreen</div>
+      <div class="card-title">Can You Tap the Screen?</div>
+      <div class="card-value" id="touch-value">—</div>
+      <div class="card-explain">Websites know whether your device has a touchscreen. <strong>Useful for adapting the interface, but also part of your fingerprint.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🧠</div>
+    <div class="card-body">
+      <div class="card-label">CPU Cores</div>
+      <div class="card-title">How Powerful Your Processor Is</div>
+      <div class="card-value" id="cpu-value">—</div>
+      <div class="card-explain">The number of CPU cores in your device is readable by websites. <strong>Another detail that contributes to your unique device fingerprint.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">💾</div>
+    <div class="card-body">
+      <div class="card-label">RAM</div>
+      <div class="card-title">How Much Memory Your Device Has</div>
+      <div class="card-value" id="ram-value">—</div>
+      <div class="card-explain">An approximate amount of RAM is exposed to websites. <strong>Combined with CPU, screen, and GPU info, it narrows down your exact device model.</strong></div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: Behaviour ── -->
+  <div class="section-label reveal">👀 What you've done so far</div>
+
+  <div class="card reveal">
+    <div class="card-icon">⏱️</div>
+    <div class="card-body">
+      <div class="card-label">Time on Page</div>
+      <div class="card-title">How Long You've Been Here</div>
+      <div class="card-value" id="time-value">0 seconds</div>
+      <div class="card-explain">Websites track exactly how long you spend on each page — including every scroll, pause, and return visit.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🖱️</div>
+    <div class="card-body">
+      <div class="card-label">Mouse Position</div>
+      <div class="card-title">Where Your Cursor Is Right Now</div>
+      <div class="card-value" id="mouse-value">Move your mouse…</div>
+      <div class="card-explain">Websites can track your exact cursor position in real time. <strong>Mouse movement patterns are unique enough to identify you.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">📜</div>
+    <div class="card-body">
+      <div class="card-label">Scroll Depth</div>
+      <div class="card-title">How Far Down You've Read</div>
+      <div class="card-value" id="scroll-value">0%</div>
+      <div class="card-explain">Every pixel you scroll is tracked. <strong>Advertisers use this to know whether you actually read an article</strong> — or just opened it.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">↩️</div>
+    <div class="card-body">
+      <div class="card-label">Referrer</div>
+      <div class="card-title">The Last Website You Were On</div>
+      <div class="card-value" id="referrer-value">—</div>
+      <div class="card-explain">When you click a link to visit a website, <strong>that site can see which website sent you</strong>. This is called the "referrer".</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: Fingerprint ── -->
+  <div class="section-label reveal">🧬 Your digital fingerprint</div>
+
+  <div class="card reveal">
+    <div class="card-icon">🔢</div>
+    <div class="card-body">
+      <div class="card-label">Browser Fingerprint</div>
+      <div class="card-title">Your Unique Browser ID</div>
+      <div class="card-value" id="fp-value">Calculating… <span class="loading"></span></div>
+      <div class="card-explain">By combining all the information above, websites can create a unique ID for your device. <strong>This works even if you clear your cookies.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🎨</div>
+    <div class="card-body">
+      <div class="card-label">Canvas Fingerprint</div>
+      <div class="card-title">Your Browser's Unique Drawing Style</div>
+      <div class="card-value" id="canvas-hash">Rendering… <span class="loading"></span></div>
+      <canvas id="canvas-fp" width="280" height="60" style="display:none;margin-top:8px;border-radius:8px;max-width:100%"></canvas>
+      <div class="card-explain" style="margin-top:8px">Your graphics hardware renders this tiny image in a way <strong>subtly different from every other device</strong>. The pixel differences become your fingerprint.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🖥️</div>
+    <div class="card-body">
+      <div class="card-label">WebGL — Graphics Card</div>
+      <div class="card-title">What's Doing the Drawing Inside Your Device</div>
+      <div class="card-value" id="webgl-value">—</div>
+      <div class="card-explain">Your GPU name is readable by every website through WebGL. <strong>Very few people share the exact same GPU and driver version.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🎵</div>
+    <div class="card-body">
+      <div class="card-label">Audio Fingerprint</div>
+      <div class="card-title">Your Device's Unique Sound Signature</div>
+      <div class="card-value" id="audio-value">Calculating… <span class="loading"></span></div>
+      <div class="card-explain">Your browser silently processes a tiny piece of audio (you won't hear anything). <strong>The way your hardware handles sound is microscopically unique.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🔤</div>
+    <div class="card-body">
+      <div class="card-label">Installed Fonts</div>
+      <div class="card-title">Which Text Styles Are on Your Device</div>
+      <div class="card-value" id="fonts-count">Detecting… <span class="loading"></span></div>
+      <div class="card-explain" id="fonts-value" style="margin-bottom:8px;word-break:break-word"></div>
+      <div class="card-explain">The fonts on your device depend on your OS, region, and apps. <strong>The exact combination is surprisingly unique.</strong></div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">🍪</div>
+    <div class="card-body">
+      <div class="card-label">Cookies</div>
+      <div class="card-title">Tiny Files Stored on Your Device</div>
+      <div class="card-value" id="cookie-value">—</div>
+      <div class="card-explain">Cookies are small files websites leave on your device. <strong>They remember who you are</strong> next time you visit. Some cookies track you across many different websites.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">📦</div>
+    <div class="card-body">
+      <div class="card-label">Local Storage</div>
+      <div class="card-title">More Data Saved on Your Device</div>
+      <div class="card-value" id="storage-value">—</div>
+      <div class="card-explain">Like cookies but bigger. <strong>Websites can store even more data on your device</strong> — including tracking IDs that survive cookie deletion.</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: Permissions ── -->
+  <div class="section-label reveal">🎙️ What websites can ask permission for</div>
+
+  <div class="perm-banner reveal">
+    <span>⚠️</span>
+    <span>The items below need your <strong>permission</strong> before a website can access them. Your browser will always show a pop-up to ask first. You are always in control — you can say no!</span>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">📍</div>
+    <div class="card-body">
+      <div class="card-label">GPS Location (With Permission)</div>
+      <div class="card-title">Your Exact Location</div>
+      <div class="card-value" id="gps-value">Click the button below to test →</div>
+      <a id="maps-link" class="maps-link" href="#" target="_blank" rel="noopener">🗺️ See your location on Google Maps</a>
+      <button class="btn-gps" onclick="testGPS()">🗺️ Try it (browser will ask first)</button>
+      <div class="card-explain" style="margin-top:10px">If you say <strong>yes</strong>, a website can see your exact street address — accurate to a few metres. Be careful which sites you say yes to.</div>
+    </div>
+  </div>
+
+  <div class="card reveal">
+    <div class="card-icon">📷</div>
+    <div class="card-body">
+      <div class="card-label">Camera &amp; Microphone (With Permission)</div>
+      <div class="card-title">Your Camera and Microphone</div>
+      <div class="card-value">Only accessible if you say yes</div>
+      <div class="card-explain">Video call apps like Zoom need your camera and microphone. But <strong>only ever say yes to websites you fully trust</strong>. Your browser always asks first.</div>
+    </div>
+  </div>
+
+  <!-- ── EXPLAINER ── -->
+  <div class="explainer reveal">
+    <h2>🤔 So what does all this mean?</h2>
+    <p>Websites collect this information for different reasons. Some are helpful, some are a bit sneaky.</p>
+    <div class="ex-grid">
+      <div class="ex-item"><span class="ex-emoji">🛍️</span><h4>Shopping Sites</h4><p>Track what you looked at to show you ads for the same things elsewhere.</p></div>
+      <div class="ex-item"><span class="ex-emoji">📰</span><h4>News Sites</h4><p>Track what you read to guess your political views and interests.</p></div>
+      <div class="ex-item"><span class="ex-emoji">📱</span><h4>Social Media</h4><p>Collect the most data — your friends, opinions, location, and behaviour.</p></div>
+      <div class="ex-item"><span class="ex-emoji">🔍</span><h4>Search Engines</h4><p>Remember every search you've ever typed to build a profile about you.</p></div>
+    </div>
+  </div>
+
+  <!-- ── TIPS ── -->
+
+</div><!-- /wrap -->
+</div><!-- /content -->
+
+<footer>
+  <p>🔒 <strong>This page is 100% safe.</strong> None of your data was saved, sent, or stored anywhere.</p>
+  <p style="margin-top:6px">Built to help people understand privacy on the internet. Share it with someone you care about! ❤️</p>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   1. SCROLL REVEAL
+══════════════════════════════════════════════════════════ */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      // Stagger cards within the same batch
+      const delay = entry.target.classList.contains('card') ? 0 : 0;
+      setTimeout(() => entry.target.classList.add('visible'), delay);
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+// Stagger sibling cards
+let cardGroups = [];
+document.querySelectorAll('.reveal').forEach(el => {
+  revealObserver.observe(el);
+});
+
+// Re-observe cards with stagger
+document.querySelectorAll('.card.reveal').forEach((card, i) => {
+  revealObserver.unobserve(card);
+  const staggerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // find siblings visible at same time
+        setTimeout(() => entry.target.classList.add('visible'), (i % 4) * 80);
+        staggerObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+  staggerObserver.observe(card);
+});
+
+
+/* ══════════════════════════════════════════════════════════
+   2. LIVE TRACKING
+══════════════════════════════════════════════════════════ */
+// Time on page
+let startTime = Date.now();
+setInterval(() => {
+  const secs = Math.floor((Date.now() - startTime) / 1000);
+  const el = document.getElementById('time-value');
+  if (el) el.textContent = secs < 60
+    ? secs + ' second' + (secs !== 1 ? 's' : '')
+    : Math.floor(secs / 60) + ' min ' + (secs % 60) + ' sec';
+}, 1000);
+
+// Mouse position
+document.addEventListener('mousemove', e => {
+  const el = document.getElementById('mouse-value');
+  if (el) el.textContent = `X: ${e.clientX}px, Y: ${e.clientY}px`;
+});
+
+// Scroll depth
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('scroll-value');
+  if (!el) return;
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
+  el.textContent = pct + '%';
+}, { passive: true });
+
+
+/* ══════════════════════════════════════════════════════════
+   3. INSTANT BROWSER DATA
+══════════════════════════════════════════════════════════ */
+(function() {
+  const ua = navigator.userAgent;
+
+  // Browser
+  let browser = 'Unknown browser';
+  if (/Edg\//.test(ua))        browser = 'Microsoft Edge';
+  else if (/OPR\//.test(ua))   browser = 'Opera';
+  else if (/Firefox\//.test(ua)) browser = 'Mozilla Firefox';
+  else if (/Chrome\//.test(ua))  browser = 'Google Chrome';
+  else if (/Safari\//.test(ua))  browser = 'Apple Safari';
+  const bvMatch = ua.match(/(Chrome|Firefox|Edg|OPR|Safari)\/(\d+)/);
+  if (bvMatch) browser += ' ' + bvMatch[2];
+  document.getElementById('browser-value').textContent = browser;
+
+  // Device type
+  let device = 'Desktop computer';
+  if (/Mobi|Android/i.test(ua)) device = '📱 Mobile phone';
+  else if (/Tablet|iPad/i.test(ua)) device = '📱 Tablet';
+  document.getElementById('device-value').textContent = device;
+
+  // Screen
+  document.getElementById('screen-value').textContent =
+    `${screen.width} × ${screen.height} px (${window.devicePixelRatio}× pixel ratio)`;
+
+  // OS
+  let os = 'Unknown OS';
+  if (/Windows NT 10/.test(ua))      os = 'Windows 10 / 11';
+  else if (/Windows/.test(ua))       os = 'Windows';
+  else if (/Mac OS X/.test(ua))      os = 'macOS';
+  else if (/iPhone|iPad/.test(ua))   os = 'iOS';
+  else if (/Android/.test(ua))       os = 'Android';
+  else if (/Linux/.test(ua))         os = 'Linux';
+  document.getElementById('os-value').textContent = os;
+
+  // Language
+  document.getElementById('lang-value').textContent =
+    navigator.language + (navigator.languages?.length > 1
+      ? ` (also: ${navigator.languages.slice(1,3).join(', ')})` : '');
+
+  // Time zone
+  document.getElementById('tz-value').textContent =
+    Intl.DateTimeFormat().resolvedOptions().timeZone +
+    ' (UTC' + (new Date().getTimezoneOffset() / -60 >= 0 ? '+' : '') +
+    new Date().getTimezoneOffset() / -60 + ')';
+
+  // Connection
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  document.getElementById('connection-value').textContent = conn
+    ? `${conn.effectiveType?.toUpperCase() || '—'} — ${conn.downlink || '?'} Mbps`
+    : 'Not available on this browser';
+
+  // Do Not Track
+  const dnt = navigator.doNotTrack || window.doNotTrack;
+  document.getElementById('dnt-value').textContent =
+    dnt === '1' ? '✅ Enabled — but most websites ignore it'
+    : dnt === '0' ? '❌ Disabled'
+    : '⚠️ Not set — most sites ignore it anyway';
+
+  // Dark mode
+  document.getElementById('darkmode-value').textContent =
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? '🌙 Dark mode' : '☀️ Light mode';
+
+  // Touch
+  const touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  document.getElementById('touch-value').textContent = touch
+    ? `✅ Touchscreen (${navigator.maxTouchPoints} touch points)`
+    : '🖱️ No touchscreen detected';
+
+  // CPU
+  document.getElementById('cpu-value').textContent =
+    navigator.hardwareConcurrency
+      ? navigator.hardwareConcurrency + ' logical cores'
+      : 'Not available';
+
+  // RAM
+  document.getElementById('ram-value').textContent =
+    navigator.deviceMemory
+      ? '~' + navigator.deviceMemory + ' GB'
+      : 'Not available on this browser';
+
+  // Cookies / Storage
+  document.getElementById('cookie-value').textContent =
+    navigator.cookieEnabled ? '✅ Cookies are enabled' : '❌ Cookies are disabled';
+  try {
+    localStorage.setItem('_pm_test','1'); localStorage.removeItem('_pm_test');
+    document.getElementById('storage-value').textContent = '✅ Local storage is enabled';
+  } catch(e) {
+    document.getElementById('storage-value').textContent = '❌ Local storage is disabled';
+  }
+
+  // Referrer
+  document.getElementById('referrer-value').textContent =
+    document.referrer ? document.referrer : 'None (you came directly or via a private link)';
+})();
+
+
+/* ══════════════════════════════════════════════════════════
+   4. BATTERY
+══════════════════════════════════════════════════════════ */
+if (navigator.getBattery) {
+  navigator.getBattery().then(b => {
+    const update = () => {
+      const pct = Math.round(b.level * 100);
+      const charging = b.charging ? '⚡ Charging' : '🔋 On battery';
+      document.getElementById('battery-value').textContent = `${pct}% — ${charging}`;
+    };
+    update();
+    b.addEventListener('levelchange', update);
+    b.addEventListener('chargingchange', update);
+  }).catch(() => {
+    document.getElementById('battery-value').textContent = 'Not available on this browser';
+  });
+} else {
+  document.getElementById('battery-value').textContent = 'Not available on this browser';
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   5. IP LOOKUP (fallback chain)
+══════════════════════════════════════════════════════════ */
+(async function() {
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+
+  async function tryCf() {
+    const r = await fetch('https://cloudflare.com/cdn-cgi/trace');
+    const txt = await r.text();
+    const ip = txt.match(/ip=(.+)/)?.[1]?.trim();
+    if (!ip) throw new Error();
+    set('ip-value', ip);
+    const r2 = await fetch(`https://ipwho.is/${ip}`);
+    const d = await r2.json();
+    if (!d.success) throw new Error();
+    set('location-value', [d.city, d.region, d.country].filter(Boolean).join(', '));
+    set('isp-value', d.connection?.isp || d.org || '—');
+  }
+
+  async function tryIpwho() {
+    const r = await fetch('https://ipwho.is/');
+    const d = await r.json();
+    if (!d.success) throw new Error();
+    set('ip-value', d.ip);
+    set('location-value', [d.city, d.region, d.country].filter(Boolean).join(', '));
+    set('isp-value', d.connection?.isp || '—');
+  }
+
+  async function tryIpapi() {
+    const r = await fetch('https://ipapi.co/json/');
+    const d = await r.json();
+    set('ip-value', d.ip || '—');
+    set('location-value', [d.city, d.region, d.country_name].filter(Boolean).join(', '));
+    set('isp-value', d.org || '—');
+  }
+
+  async function tryIpify() {
+    const r = await fetch('https://api.ipify.org?format=json');
+    const d = await r.json();
+    set('ip-value', d.ip || '—');
+    set('location-value', 'Not available');
+    set('isp-value', 'Not available');
+  }
+
+  for (const fn of [tryCf, tryIpwho, tryIpapi, tryIpify]) {
+    try { await fn(); break; }
+    catch(e) { continue; }
+  }
+})();
+
+
+/* ══════════════════════════════════════════════════════════
+   6. FINGERPRINTING
+══════════════════════════════════════════════════════════ */
+// Canvas fingerprint
+(function() {
+  const canvas = document.getElementById('canvas-fp');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#f0f4ff';
+  ctx.fillRect(0, 0, 280, 60);
+  ctx.fillStyle = '#5b6af0';
+  ctx.font = 'bold 14px Outfit, sans-serif';
+  ctx.fillText('Privacy Mirror 🔍 — your canvas fingerprint', 10, 22);
+  ctx.fillStyle = '#c05ab0';
+  ctx.font = '11px monospace';
+  ctx.fillText('abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%', 10, 40);
+  ctx.strokeStyle = '#f06070';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(250, 30, 18, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = 'rgba(91,106,240,0.15)';
+  ctx.fillRect(10, 48, 240, 6);
+  canvas.style.display = 'block';
+
+  // Hash
+  const data = canvas.toDataURL();
+  let h = 0;
+  for (let i = 0; i < data.length; i++) {
+    h = ((h << 5) - h) + data.charCodeAt(i);
+    h |= 0;
+  }
+  const hash = (h >>> 0).toString(16).toUpperCase().padStart(8,'0');
+  document.getElementById('canvas-hash').textContent =
+    hash.slice(0,4) + '-' + hash.slice(4,8);
+})();
+
+// WebGL
+(function() {
+  const el = document.getElementById('webgl-value');
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    el.textContent = ext
+      ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)
+      : gl.getParameter(gl.RENDERER);
+  } catch(e) { el.textContent = 'Not available'; }
+})();
+
+// Audio fingerprint
+(async function() {
+  const el = document.getElementById('audio-value');
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const analyser = ctx.createAnalyser();
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    osc.type = 'triangle';
+    osc.connect(analyser);
+    analyser.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(0);
+    await new Promise(r => setTimeout(r, 100));
+    const buf = new Float32Array(analyser.frequencyBinCount);
+    analyser.getFloatFrequencyData(buf);
+    osc.stop();
+    ctx.close();
+    let h = 0;
+    buf.slice(0, 32).forEach(v => { h = ((h << 5) - h) + Math.round(v * 1000); h |= 0; });
+    const hash = (h >>> 0).toString(16).toUpperCase().padStart(8,'0');
+    el.textContent = hash.slice(0,4) + '-' + hash.slice(4,8);
+  } catch(e) { el.textContent = 'Not available'; }
+})();
+
+// Font detection
+(function() {
+  const fonts = [
+    'Arial','Helvetica','Times New Roman','Georgia','Courier New',
+    'Verdana','Trebuchet MS','Impact','Comic Sans MS','Palatino',
+    'Garamond','Bookman','Tahoma','Lucida Console','Monaco',
+    'Gill Sans','Optima','Futura','Century Gothic','Calibri'
+  ];
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = '72px monospace';
+  const baseW = ctx.measureText('abcdefghijklm').width;
+  const found = fonts.filter(f => {
+    ctx.font = `72px '${f}', monospace`;
+    return ctx.measureText('abcdefghijklm').width !== baseW;
+  });
+  document.getElementById('fonts-count').textContent =
+    `${found.length} of ${fonts.length} test fonts detected`;
+  const fv = document.getElementById('fonts-value');
+  if (found.length > 0) {
+    fv.textContent = 'Detected: ' + found.join(', ');
+    fv.style.display = 'block';
+  }
+})();
+
+// Overall fingerprint hash
+(function() {
+  const str = navigator.userAgent + screen.width + screen.height +
+    navigator.language + new Date().getTimezoneOffset() +
+    navigator.hardwareConcurrency + navigator.deviceMemory;
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h) + str.charCodeAt(i);
+  const hash = (h >>> 0).toString(16).toUpperCase().padStart(8,'0');
+  document.getElementById('fp-value').textContent =
+    hash.slice(0,4)+'-'+hash.slice(4,6)+'-'+hash.slice(6,8);
+})();
+
+// Ad blocker
+(function() {
+  const el = document.getElementById('adblock-value');
+  const decoy = document.createElement('div');
+  decoy.className = 'ad-banner adsbox advert ad-slot';
+  decoy.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+  document.body.appendChild(decoy);
+  setTimeout(() => {
+    const hidden = decoy.offsetHeight === 0 || getComputedStyle(decoy).display === 'none';
+    el.textContent = hidden ? '🛡️ Ad blocker detected' : '✅ No ad blocker detected';
+    decoy.remove();
+  }, 200);
+})();
+
+
+/* ══════════════════════════════════════════════════════════
+   7. GPS
+══════════════════════════════════════════════════════════ */
+function testGPS() {
+  const el = document.getElementById('gps-value');
+  el.innerHTML = 'Asking your browser… <span class="loading"></span>';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
+      el.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)} (±${Math.round(acc)}m)`;
+      const link = document.getElementById('maps-link');
+      link.href = `https://www.google.com/maps?q=${lat},${lon}`;
+      link.style.display = 'inline-block';
+    },
+    () => { el.textContent = '❌ Permission denied'; }
+  );
+}
+</script>
+</body>
+</html>
