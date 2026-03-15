@@ -307,7 +307,7 @@ function testGPS() {
       el.textContent = `Latitude: ${lat}, Longitude: ${lon} — accurate to within ${acc} metres!`;
 
       const mapsLink = document.getElementById('maps-link');
-      mapsLink.href = `https://www.google.com/maps?q=${lat},${lon}`;
+      mapsLink.href = `https://www.openstreetmap.org/search?query=${lat},${lon}`;
       mapsLink.style.display = 'inline-block';
     },
     err => {
