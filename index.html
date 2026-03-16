@@ -771,16 +771,28 @@ window.addEventListener('scroll', () => {
 (function() {
   const ua = navigator.userAgent;
 
-  // Browser
+  // Browser — checked most-specific first (many Chromium forks include "Chrome/" in their UA)
   let browser = 'Unknown browser';
-  if (/Edg\//.test(ua))        browser = 'Microsoft Edge';
-  else if (/OPR\//.test(ua))   browser = 'Opera';
-  else if (/Firefox\//.test(ua)) browser = 'Mozilla Firefox';
-  else if (/Chrome\//.test(ua))  browser = 'Google Chrome';
-  else if (/Safari\//.test(ua))  browser = 'Apple Safari';
-  const bvMatch = ua.match(/(Chrome|Firefox|Edg|OPR|Safari)\/(\d+)/);
+  if      (/Vivaldi\//.test(ua))         browser = 'Vivaldi';
+  else if (/DuckDuckGo\//.test(ua))      browser = 'DuckDuckGo Browser';
+  else if (/SamsungBrowser\//.test(ua))  browser = 'Samsung Internet';
+  else if (/UCBrowser\//.test(ua))       browser = 'UC Browser';
+  else if (/Puffin\//.test(ua))          browser = 'Puffin Browser';
+  else if (/Edg\//.test(ua))             browser = 'Microsoft Edge';
+  else if (/OPR\//.test(ua))             browser = 'Opera';
+  else if (/Firefox\//.test(ua))         browser = 'Mozilla Firefox';
+  else if (/Chrome\//.test(ua))          browser = 'Google Chrome';
+  else if (/Safari\//.test(ua))          browser = 'Apple Safari';
+  const bvMatch = ua.match(/(Vivaldi|DuckDuckGo|SamsungBrowser|UCBrowser|Puffin|Chrome|Firefox|Edg|OPR|Safari)\/(\d+)/);
   if (bvMatch) browser += ' ' + bvMatch[2];
-  document.getElementById('browser-value').textContent = browser;
+  const browserEl = document.getElementById('browser-value');
+  browserEl.textContent = browser;
+  // Brave hides itself behind a Chrome UA; detect it via its async API
+  if (navigator.brave?.isBrave) {
+    navigator.brave.isBrave().then(isBrave => {
+      if (isBrave) browserEl.textContent = 'Brave Browser';
+    }).catch(() => {});
+  }
 
   // Device type
   let device = 'Desktop computer';
