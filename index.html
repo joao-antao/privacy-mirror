@@ -783,8 +783,21 @@ window.addEventListener('scroll', () => {
   else if (/Firefox\//.test(ua))         browser = 'Mozilla Firefox';
   else if (/Chrome\//.test(ua))          browser = 'Google Chrome';
   else if (/Safari\//.test(ua))          browser = 'Apple Safari';
-  const bvMatch = ua.match(/(Vivaldi|DuckDuckGo|SamsungBrowser|UCBrowser|Puffin|Chrome|Firefox|Edg|OPR|Safari)\/(\d+)/);
-  if (bvMatch) browser += ' ' + bvMatch[2];
+  // Extract version for the *detected* browser specifically, not just the first token match
+  const versionPatterns = {
+    'Vivaldi':          /Vivaldi\/(\d+)/,
+    'DuckDuckGo Browser': /DuckDuckGo\/(\d+)/,
+    'Samsung Internet': /SamsungBrowser\/(\d+)/,
+    'UC Browser':       /UCBrowser\/(\d+)/,
+    'Puffin Browser':   /Puffin\/(\d+)/,
+    'Microsoft Edge':   /Edg\/(\d+)/,
+    'Opera':            /OPR\/(\d+)/,
+    'Mozilla Firefox':  /Firefox\/(\d+)/,
+    'Google Chrome':    /Chrome\/(\d+)/,
+    'Apple Safari':     /Version\/(\d+)/,
+  };
+  const vMatch = versionPatterns[browser]?.exec(ua);
+  if (vMatch) browser += ' ' + vMatch[1];
   const browserEl = document.getElementById('browser-value');
   browserEl.textContent = browser;
   // Brave hides itself behind a Chrome UA; detect it via its async API
@@ -1084,7 +1097,7 @@ function testGPS() {
       const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
       el.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)} (±${Math.round(acc)}m)`;
       const link = document.getElementById('maps-link');
-      link.href = `https://www.google.com/maps?q=${lat},${lon}`;
+      link.href = `https://www.openstreetmap.org/search?query=${lat},${lon}`;
       link.style.display = 'inline-block';
     },
     () => { el.textContent = '❌ Permission denied'; }
